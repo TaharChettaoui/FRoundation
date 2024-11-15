@@ -17,9 +17,7 @@ PyTorch implementation and pretrained models for **FRoundation**.
 | DINOv2  | <br>Small <br><br><br><br> Large <br><br>  | CASIA-WebFace <br> MS1MV2 <br> WebFace4M <br><br> CASIA-WebFace <br> MS1MV2 <br> WebFace4M|... <br> ... <br> ... <br><br> ... <br> ... <br> ...|
 
 ### Usage
-
-First install all the depencies on the **requirements.txt**. This code was tested with **Python 3.9**.
-Example code to load the model and pretrained weights, in this case for CLIP ViT
+First, install all the dependencies listed in the requirements.txt file. This code has been tested with Python 3.9. Below is an example of how to load the model and pretrained weights, specifically for CLIP ViT-B/16.
 
 ```
 import sys
@@ -60,6 +58,14 @@ model.backbone.load_state_dict(torch.load(model_path))
 model.backbone.visual # To access the image encoder of CLIP
 ```
 
+### Training
+After updating the config.config.py file with the required paths and desired parameters, you can initiate training using:
+
+```
+./train.sh
+```
+
+In addition to logs that document the loss and hyperparameters during training, a **TensorBoard** with various plots is also available.
 
 ### Coming soon ...
 - [ ] Pretrained models link
