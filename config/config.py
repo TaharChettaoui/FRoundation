@@ -56,8 +56,8 @@ elif config.model_name == "clip":
     config.interpolation_type = "bicubic"
 
 # Dataset (Training)
-# Real:         "MS1MV2" / "casia_webface" / "WEBFACE4M"
-# Synthetic:    "Idifface" /  " "
+# Real: "MS1MV2" / "casia_webface" / "WEBFACE4M"
+# Synthetic: "Idifface" /  "DCFace"
 config.dataset_name = "casia_webface"
 if config.dataset_name == "casia_webface":
     config.dataset_path = "/home/chettaou/data/casia_training"
@@ -76,12 +76,16 @@ elif config.dataset_name == "Idifface":
     config.dataset_path = "Training_data_path"
     config.num_classes = 10000 # 10049
     config.num_image = 502403 
+elif config.dataset_name == "DCFace":
+    config.dataset_path = "/data/Biometrics/database/Synthetic/DCFace"
+    config.num_classes = 10000 
+    config.num_image = 518920
 
 # Evaluation
 # "lfw", "cfp_fp", "cfp_ff", "agedb_30", "calfw", "cplfw"
 # RFW: "African_test", "Asian_test", "Caucasian_test", "Indian_test"
 config.eval_path = "/home/chettaou/data/validation"
-config.val_targets = ["lfw"] # , "cfp_fp", "cfp_ff", "agedb_30", "calfw", "cplfw"]
+config.val_targets = ["lfw", "cfp_fp", "cfp_ff", "agedb_30", "calfw", "cplfw"]
 config.eval_every = 5
 config.save_every = 10
 config.batch_size_eval = 16

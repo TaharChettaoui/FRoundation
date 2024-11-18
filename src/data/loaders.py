@@ -56,6 +56,49 @@ class IdifFace(Dataset):
         return len(self.imgidx)
 
 
+class DCFace(Dataset):
+    def __init__(self, root_dir, local_rank, transform, num_classes):
+        super(DCFace, self).__init__()
+        self.transform = transform
+        self.root_dir = root_dir
+        self.local_rank = local_rank
+        self.imgidx, self.labels = self.scan(root_dir, num_classes)
+
+    def scan(self, root, num_classes):
+        imgidex = []
+        labels = []
+        lb = -1
+        list_dir = os.listdir(root)
+        list_dir.sort()
+
+        for l in list_dir[:num_classes]:
+            images = os.listdir(os.path.join(root,l))
+            lb += 1
+            for img in images:
+                imgidex.append(os.path.join(l,img))
+                labels.append(lb)
+
+        return imgidex,labels
+        
+    def read_image(self,path):
+        return cv2.imread(os.path.join(self.root_dir,path))
+
+    def __getitem__(self, index):
+        path = self.imgidx[index]
+        img = self.read_image(path)
+        label = self.labels[index]
+        label = torch.tensor(label, dtype=torch.long)
+        sample = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+
+        if self.transform is not None:
+            sample = self.transform(sample)
+        
+        return sample, label
+
+    def __len__(self):
+        return len(self.imgidx)
+
+
 class CasiaWebFace(Dataset):
     def __init__(self, root_dir, local_rank, transform, num_classes, selective):
         super(CasiaWebFace, self).__init__()
@@ -106,6 +149,7 @@ class CasiaWebFace(Dataset):
 
     def __len__(self):
         return len(self.imgidx)
+
 
 class MS1MV2(Dataset):
     def __init__(self, root_dir, local_rank, img_size, transform):

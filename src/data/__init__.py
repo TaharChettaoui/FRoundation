@@ -1,4 +1,4 @@
-from .loaders import CasiaWebFace, MS1MV2, IdifFace
+from .loaders import CasiaWebFace, MS1MV2, IdifFace, DCFace
 from .lmdb_dataset import LmdbDataset
 
 
@@ -35,6 +35,15 @@ def get_dataset(rank, transform, **kwargs):
             transform=transform,
             num_classes=kwargs["num_classes"]
         )
+
+    elif dataset_name == "DCFace":
+        trainset = DCFace(
+            root_dir=kwargs["dataset_path"], 
+            local_rank=rank, 
+            transform=transform,
+            num_classes=kwargs["num_classes"]
+        )
+        
         
     else:
         raise ValueError()
