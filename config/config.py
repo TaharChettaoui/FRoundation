@@ -60,7 +60,7 @@ elif config.model_name == "clip":
 # Synthetic: "Idifface" /  "DCFace"
 config.dataset_name = "casia_webface"
 if config.dataset_name == "casia_webface":
-    config.dataset_path = "/home/chettaou/data/casia_training"
+    config.dataset_path = "Training_data_path"
     config.selective_dataset = False
     config.num_classes = 10572
     config.num_image = 501195
@@ -77,14 +77,14 @@ elif config.dataset_name == "Idifface":
     config.num_classes = 10000 # 10049
     config.num_image = 502403 
 elif config.dataset_name == "DCFace":
-    config.dataset_path = "/data/Biometrics/database/Synthetic/DCFace"
+    config.dataset_path = "Training_data_path"
     config.num_classes = 10000 
     config.num_image = 518920
 
 # Evaluation
 # "lfw", "cfp_fp", "cfp_ff", "agedb_30", "calfw", "cplfw"
 # RFW: "African_test", "Asian_test", "Caucasian_test", "Indian_test"
-config.eval_path = "/home/chettaou/data/validation"
+config.eval_path = "eval_data_path"
 config.val_targets = ["lfw", "cfp_fp", "cfp_ff", "agedb_30", "calfw", "cplfw"]
 config.eval_every = 5
 config.save_every = 10
