@@ -70,7 +70,7 @@ In addition to logs that document the loss and hyperparameters during training, 
 ### Coming soon ...
 - [ ] Pretrained models link
 - [ ] Dinov2Training pipeline
-- [ ] Evaluation code
+- [ ] Evaluation code (IJB-C / IJB-B)
 
 ### Citation
 
