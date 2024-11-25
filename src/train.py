@@ -30,6 +30,7 @@ def main(args):
     torch.cuda.set_device(local_rank)
     world_size = dist.get_world_size()
     cfg.batch_size = cfg.global_batch_size // world_size # batch_size per GPU
+    find_unused_parameters = True if cfg.model_name == "baseline" else False
 
     # Logging
     TrainingLogger(local_rank, cfg.output_path)
@@ -60,7 +61,7 @@ def main(args):
     model = get_model(local_rank, **cfg)
     if cfg.use_lora: # LoRA
         apply_lora_model(local_rank, model, **cfg)
-    model = DistributedDataParallel(module=model.backbone, broadcast_buffers=False, device_ids=[local_rank], find_unused_parameters=False)
+    model = DistributedDataParallel(module=model.backbone, broadcast_buffers=False, device_ids=[local_rank], find_unused_parameters=find_unused_parameters)
     model.train()
 
     # Header

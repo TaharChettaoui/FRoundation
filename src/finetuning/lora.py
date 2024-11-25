@@ -1,5 +1,6 @@
 import torch
 
+from peft import LoraConfig, LoraModel
 from .loralib.layers import PlainMultiheadAttentionLoRA
 
 
@@ -30,3 +31,17 @@ def apply_lora_clip(model, training_type, model_name, target_modules, lora_rank,
                     list_lora_layers.append(new_multi_head_lora)
     
     return list_lora_layers
+
+
+def apply_lora_peft(rank, model, lora_r, lora_a, lora_target_modules, lora_dropout, use_rslora):
+
+    lora_config = LoraConfig(
+        task_type="FEATURE_EXTRACTION", # "TOKEN_CLS"
+        r=lora_r,
+        lora_alpha=lora_a,
+        target_modules=lora_target_modules,
+        lora_dropout=lora_dropout,
+        use_rslora=use_rslora,
+    )
+
+    return LoraModel(model.backbone, lora_config, "default").to(rank)
