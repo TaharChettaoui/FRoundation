@@ -19,6 +19,7 @@ def apply_lora_model(rank, model, **kwargs):
             lora_rank=kwargs["lora_r"], 
             lora_alpha=kwargs["lora_a"], 
             lora_dropout=kwargs["lora_dropout"], 
+            use_rslora=kwargs["use_rslora"],
             device=rank, 
             position="all"
         )
