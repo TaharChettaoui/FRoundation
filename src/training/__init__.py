@@ -1,9 +1,11 @@
-from .trainer import TrainerClip
+from .trainer import TrainerClip, TrainerDinov2
 from .losses import ElasticArcFace, ElasticCosFace, ArcFace, CosFace, AdaFace
 
 def get_trainer(rank, world_size, model_name, model, transform, trainset, dataloader, train_sampler, training_type, config, header):
     if model_name == "clip":
         trainer = TrainerClip(rank, world_size, model, transform, trainset, dataloader, train_sampler, training_type, config, header)
+    elif model_name == "dinov2" or model_name == "baseline":
+        trainer = TrainerDinov2(rank, world_size, model, transform, trainset, dataloader, train_sampler, training_type, config, header)
     else:
         raise ValueError()
     

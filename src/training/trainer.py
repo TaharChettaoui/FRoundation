@@ -252,3 +252,96 @@ class TrainerClip(Trainer):
             self.callback_save_model(epoch, self.model)
         
         self.tensorboard_callback.close()
+
+##########################   
+########  DINOV2  ########
+##########################  
+class TrainerDinov2(Trainer):
+    def __init__(self, rank, world_size, model, transform, trainset, dataloader, train_sampler, training_type, config, header):
+        super().__init__(rank, world_size, model, transform, trainset, dataloader, train_sampler, training_type, config, header)
+    
+    def start_training(self):
+        logging.info(print_trainable_parameters(self.model))
+
+        # Optimizer
+        optimizer_model = torch.optim.AdamW(
+            params=[{'params': self.model.parameters()}], betas=(0.9, 0.999),
+            lr=self.config.lr_model, weight_decay=self.config.weight_decay
+        )
+        optimizer_header = torch.optim.AdamW(
+            params=[{'params': self.header.parameters()}], betas=(0.9, 0.999),
+            lr=self.config.lr_header, weight_decay=self.config.weight_decay
+        )
+
+        # Scheduler
+        scheduler_model = get_scheduler( 
+                scheduler_type=self.config.scheduler_type, 
+                optimizer_model=optimizer_model, 
+                epoch=self.config.num_epoch, 
+                warmup=self.config.warmup, 
+                num_warmup_epochs=self.config.num_warmup_epochs, 
+                T_0=self.config.T_0, 
+                T_mult=self.config.T_mult, 
+                eta_min=self.config.eta_min,
+                lr_func_drop=self.config.lr_func_drop,
+        )
+        scheduler_header = get_scheduler( 
+                scheduler_type=self.config.scheduler_type, 
+                optimizer_model=optimizer_header, 
+                epoch=self.config.num_epoch, 
+                warmup=self.config.warmup, 
+                num_warmup_epochs=self.config.num_warmup_epochs, 
+                T_0=self.config.T_0, 
+                T_mult=self.config.T_mult, 
+                eta_min=self.config.eta_min,
+                lr_func_drop=self.config.lr_func_drop,
+        )
+
+        # Criterion 
+        criterion = torch.nn.CrossEntropyLoss()
+
+        for epoch in range(self.start_epoch, self.config.num_epoch):
+            self.train_sampler.set_epoch(epoch)
+            for _, (img, label) in enumerate(self.dataloader):
+                self.global_step += 1
+                img = img.cuda(self.rank, non_blocking=True)
+                label = label.cuda(self.rank, non_blocking=True)
+
+                features = self.model(img).pooler_output 
+                if self.config.loss == "AdaFace":
+                    norm = torch.norm(features, 2, 1, True)
+                    output = torch.div(features, norm)
+                    thetas = self.header(output, norm, label)
+                else:
+                    thetas = self.header(F.normalize(features), label)
+
+                loss_v = criterion(thetas, label)
+                loss_v.backward()
+
+                clip_grad_norm_(self.model.parameters(), max_norm=self.config.max_norm, norm_type=2)
+                clip_grad_norm_(self.header.parameters(), max_norm=self.config.max_norm, norm_type=2)
+
+                optimizer_model.step()
+                optimizer_header.step()
+
+                self.loss_log.update(loss_v.item(), 1)
+                self.tensorboard_callback.log_info(
+                    global_step=self.global_step, 
+                    loss=loss_v.item(), 
+                    learning_rate=scheduler_model.get_last_lr()[0],
+                    model=self.model
+                )
+                self.callback_logging(self.global_step, self.loss_log, epoch)
+                
+                optimizer_model.zero_grad()
+                optimizer_header.zero_grad()
+
+            scheduler_model.step()
+            scheduler_header.step()
+
+            val_results = self.callback_verification(epoch, self.model)
+            self.tensorboard_callback.log_verificiation(epoch, val_results)
+            self.tensorboard_callback.log_on_epoch_end(epoch, self.model)
+            self.callback_save_model(epoch, self.model)
+
+        self.tensorboard_callback.close()

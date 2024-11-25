@@ -176,7 +176,7 @@ def evaluate(embeddings, actual_issame, nrof_folds=10, pca=0):
 
 
 @torch.no_grad()
-def test(data_set, backbone, batch_size, nfolds=10):
+def test(data_set, backbone, model_name, batch_size, nfolds=10):
     print('testing verification..')
 
     data_list = data_set[0]
@@ -193,7 +193,12 @@ def test(data_set, backbone, batch_size, nfolds=10):
             _data = data[bb - batch_size: bb]
             time0 = datetime.datetime.now()
             img =  _data.to("cuda")
-            net_out: torch.Tensor = backbone(img)
+
+            if model_name == "dinov2" or model_name == "baseline":
+                net_out: torch.Tensor = backbone(img).pooler_output 
+            else:
+                net_out: torch.Tensor = backbone(img)
+
             _embeddings = net_out.detach().cpu().numpy()
             time_now = datetime.datetime.now()
             diff = time_now - time0
@@ -281,7 +286,7 @@ class CallBackVerification(object):
             backbone = backbone.module.visual
 
         for i in range(len(self.ver_list)):
-            acc1, std1, acc2, std2, xnorm, embeddings_list = test(self.ver_list[i], backbone, self.batch_size_eval, 10)
+            acc1, std1, acc2, std2, xnorm, embeddings_list = test(self.ver_list[i], backbone, self.model_name, self.batch_size_eval, 10)
             logging.info('[%s][%d]XNorm: %f' % (self.ver_name_list[i], global_step, xnorm))
             logging.info('[%s][%d]Accuracy-Flip: %1.5f+-%1.5f' % (self.ver_name_list[i], global_step, acc2, std2))
             if acc2 > self.highest_acc_list[i]:
