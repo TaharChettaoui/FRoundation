@@ -4,7 +4,7 @@ from peft import LoraConfig, LoraModel
 from .loralib.layers import PlainMultiheadAttentionLoRA
 
 
-def apply_lora_clip(model, training_type, model_name, target_modules, lora_rank, lora_alpha, lora_dropout, use_rslora, device, position="all"):
+def apply_lora_clip(model, training_type, model_name, target_modules, lora_rank, lora_alpha, lora_dropout, device, position="all"):
     list_lora_layers = []
 
     assert training_type in ["text_image_header", "text_image_contrastive", "image_encoder_only"]
@@ -16,7 +16,7 @@ def apply_lora_clip(model, training_type, model_name, target_modules, lora_rank,
                 if isinstance(submodule, torch.nn.MultiheadAttention):
                     pass
                     new_multi_head_lora = PlainMultiheadAttentionLoRA(
-                        submodule, enable_lora=target_modules, r=lora_rank, lora_alpha=lora_alpha, dropout_rate=lora_dropout, use_rslora=use_rslora).to(device)
+                        submodule, enable_lora=target_modules, r=lora_rank, lora_alpha=lora_alpha, dropout_rate=lora_dropout).to(device)
                     setattr(block, name, new_multi_head_lora)
                     list_lora_layers.append(new_multi_head_lora)
 

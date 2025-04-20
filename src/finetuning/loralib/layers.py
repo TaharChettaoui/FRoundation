@@ -33,16 +33,13 @@ class LoRALayer():
         lora_alpha: int, 
         fan_in_fan_out: bool = False,
         dropout_rate:float = 0,
-        use_rslora:bool = False,
     ):
         self.r = r
         self.lora_alpha = lora_alpha
         self.dropout_rate = dropout_rate
         if self.r > 0:
-            if use_rslora:
-                self.scaling = self.lora_alpha / math.sqrt(self.r)
-            else:
-                self.scaling = self.lora_alpha / self.r
+            #self.scaling = self.lora_alpha / self.r
+            self.scaling = self.lora_alpha/math.sqrt(self.r) # 
         # Mark the weight as unmerged
         self.merged = False
         # Set this to True if the layer to replace stores weight like (fan_in, fan_out)
@@ -348,7 +345,6 @@ class PlainMultiheadAttentionLoRA(nn.Module):
             r: int = 0, 
             lora_alpha: int = 1, 
             dropout_rate:float = 0.,
-            use_rslora:bool = False,
             **kwargs
         ):
         super().__init__()
@@ -397,7 +393,7 @@ class PlainMultiheadAttentionLoRA(nn.Module):
         self.scaled_dot_product_attention = F.scaled_dot_product_attention
         
         
-        LoRALayer.__init__(self, r=r, lora_alpha=lora_alpha, dropout_rate=dropout_rate, use_rslora=use_rslora)
+        LoRALayer.__init__(self, r=r, lora_alpha=lora_alpha, dropout_rate=dropout_rate)
         
         # Init qkv as a new lora linear layer 
         for item in enable_lora:
