@@ -74,14 +74,15 @@ In addition to logs that document the loss and hyperparameters during training, 
 ### Citation
 
 ```
-@misc{chettaoui2024froundationfoundationmodelsready,
-      title={FRoundation: Are Foundation Models Ready for Face Recognition?}, 
-      author={Tahar Chettaoui and Naser Damer and Fadi Boutros},
-      year={2024},
-      eprint={2410.23831},
-      archivePrefix={arXiv},
-      primaryClass={cs.CV},
-      url={https://arxiv.org/abs/2410.23831}, 
+@article{DBLP:journals/ivc/ChettaouiDB25,
+  author       = {Tahar Chettaoui and
+                  Naser Damer and
+                  Fadi Boutros},
+  title        = {FRoundation: Are foundation models ready for face recognition?},
+  journal      = {Image Vis. Comput.},
+  volume       = {156},
+  pages        = {105453},
+  year         = {2025}
 }
 ```
 
