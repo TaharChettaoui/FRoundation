@@ -67,10 +67,6 @@ After updating the config.config.py file with the required paths and desired par
 
 In addition to logs that document the loss and hyperparameters during training, a **TensorBoard** with various plots is also available.
 
-### Coming soon ...
-- [ ] Pretrained models link
-- [ ] Evaluation code (IJB-C / IJB-B)
-
 ### Citation
 
 ```
